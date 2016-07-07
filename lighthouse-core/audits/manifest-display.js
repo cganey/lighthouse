@@ -47,7 +47,7 @@ class ManifestDisplay extends Audit {
    */
   static audit(artifacts) {
     const manifest = artifacts.Manifest.value;
-    const displayValue = (!manifest || !manifest.display) ? undefined : manifest.display.value;
+    const displayValue = manifest && manifest.display.value;
 
     const hasRecommendedValue = ManifestDisplay.hasRecommendedValue(displayValue);
 
