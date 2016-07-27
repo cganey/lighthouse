@@ -17,11 +17,8 @@
       "speedline",
       "content-width",
       "cache-contents",
-<<<<<<< HEAD
-      "interstitial"
-=======
+      "interstitial",
       "geolocation-on-start"
->>>>>>> master
     ]
   },
   {
