@@ -17,7 +17,11 @@
       "speedline",
       "content-width",
       "cache-contents",
+<<<<<<< HEAD
       "interstitial"
+=======
+      "geolocation-on-start"
+>>>>>>> master
     ]
   },
   {
@@ -46,6 +50,7 @@
     "first-meaningful-paint",
     "speed-index-metric",
     "estimated-input-latency",
+    "time-to-interactive",
     "user-timings",
     "screenshots",
     "critical-request-chains",
@@ -67,7 +72,8 @@
     "tabindex",
     "content-width",
     "cache-start-url",
-    "interstitial"
+    "interstitial",
+    "geolocation-on-start"
   ],
 
   "aggregations": [{
@@ -106,6 +112,10 @@
         },
         "estimated-input-latency": {
           "rawValue": 100,
+          "weight": 1
+        },
+        "time-to-interactive": {
+          "value": 100,
           "weight": 1
         },
         "scrolling-60fps": {
@@ -275,6 +285,10 @@
           "weight": 1
         },
         "manifest-display": {
+          "rawValue": true,
+          "weight": 1
+        },
+        "geolocation-on-start": {
           "rawValue": true,
           "weight": 1
         },

@@ -19,25 +19,17 @@
 
 const Audit = require('./audit');
 
-class ManifestDisplay extends Audit {
+class GeolocationOnStart extends Audit {
   /**
    * @return {!AuditMeta}
    */
   static get meta() {
     return {
-      category: 'Manifest',
-      name: 'manifest-display',
-      description: 'Manifest\'s display property is set',
-      requiredArtifacts: ['Manifest']
+      category: 'UX',
+      name: 'geolocation',
+      description: 'Page does not automatically request geolocation',
+      requiredArtifacts: ['GeolocationOnStart']
     };
-  }
-
-  /**
-   * @param {string|undefined} val
-   * @return {boolean}
-   */
-  static hasRecommendedValue(val) {
-    return (val === 'fullscreen' || val === 'standalone' || val === 'browser');
   }
 
   /**
@@ -45,17 +37,18 @@ class ManifestDisplay extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const manifest = artifacts.Manifest.value;
-    const displayValue = (!manifest || !manifest.display) ? undefined : manifest.display.value;
+    if (typeof artifacts.GeolocationOnStart === 'undefined' ||
+        artifacts.GeolocationOnStart === -1) {
+      return GeolocationOnStart.generateAuditResult({
+        rawValue: false,
+        debugString: 'Unable to get geolocation values.'
+      });
+    }
 
-    const hasRecommendedValue = ManifestDisplay.hasRecommendedValue(displayValue);
-
-    return ManifestDisplay.generateAuditResult({
-      rawValue: hasRecommendedValue,
-      displayValue,
-      debugString: 'Manifest display property should be set.'
+    return GeolocationOnStart.generateAuditResult({
+      rawValue: artifacts.GeolocationOnStart
     });
   }
 }
 
-module.exports = ManifestDisplay;
+module.exports = GeolocationOnStart;
