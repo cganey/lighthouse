@@ -397,14 +397,51 @@ class Driver {
     return this.sendCommand('Network.setCacheDisabled', {cacheDisabled: true});
   }
 
-  forceUpdateServiceWorkers() {
-    // COMPAT: This command will trigger this registrationId error in Chrome 50 (51 undetermined):
-    //   "{"code":-32602,"message":"Missing or invalid 'registrationId' parameter"}"
-    return this.sendCommand('ServiceWorker.setForceUpdateOnPageLoad', {
-      forceUpdateOnPageLoad: true
+  unregisterServiceWorker(url) {
+    // first, get data about active SW versions and registrations
+    const getVersions = new Promise(resolve => {
+      this.once('ServiceWorker.workerVersionUpdated', data => resolve(data));
+    });
+    const getRegistrations = new Promise(resolve => {
+      this.once('ServiceWorker.workerRegistrationUpdated', data => resolve(data));
+    });
+
+    this.sendCommand('ServiceWorker.enable');
+
+    return Promise.all([getVersions, getRegistrations]).then(res => {
+      const versions = res[0].versions;
+      const registrations = res[1].registrations;
+      let workerVersionsToStop = [];
+      let registrationsToUnregister = [];
+
+      registrations
+        // find any non-deleted registrations where the domain matches the one entered
+        // CAVEAT: this will not match if a redirect changes domain.com to m.domain.com
+        //  it will also not match a www.domain.com if the scopeURL is set to domain.com
+        .filter(reg => !reg.isDeleted)
+        .filter(reg => URL.getHostname(reg.scopeURL) === URL.getHostname(url))
+        .forEach(reg => {
+          // Select the workers to stop.
+          versions
+            .filter(ver => ver.registrationId === reg.registrationId)
+            .forEach(ver => workerVersionsToStop.push(ver));
+
+          // Since scopeURL matches, we'll unregister this registration
+          registrationsToUnregister.push(reg);
+        });
+
+      const stopWorkers = _ => Promise.all(workerVersionsToStop.map(ver =>
+          this.sendCommand('ServiceWorker.stopWorker', {versionId: ver.versionId})));
+
+      const unregRegistrations = _ => Promise.all(registrationsToUnregister.map(reg =>
+        this.sendCommand('ServiceWorker.unregister', {scopeURL: reg.scopeURL})));
+
+      return Promise.resolve()
+        .then(stopWorkers)
+        .then(unregRegistrations)
+        .then(_ => this.sendCommand('ServiceWorker.disable'));
     });
   }
 }
 
 module.exports = Driver;
-

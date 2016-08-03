@@ -47,7 +47,7 @@ class GatherRunner {
       return driver.cleanAndDisableBrowserCaches();
     }).then(_ => {
       // Force SWs to update on load.
-      return driver.forceUpdateServiceWorkers();
+      return driver.unregisterServiceWorker(options.url);
     });
   }
 
