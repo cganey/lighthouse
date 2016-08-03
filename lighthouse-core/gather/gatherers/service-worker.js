@@ -17,18 +17,9 @@
 'use strict';
 
 const Gatherer = require('./gatherer');
+const URL = require('../../lib/url');
 
 class ServiceWorker extends Gatherer {
-
-  /**
-   * @param {string} url
-   * @return {string}
-   */
-  static getOrigin(url) {
-    const parsedURL = require('url').parse(url);
-    return `${parsedURL.protocol}//${parsedURL.hostname}` +
-        (parsedURL.port ? `:${parsedURL.port}` : '');
-  }
 
   /**
    * @param {!Array<!ServiceWorkerVersion>} versions
@@ -36,8 +27,8 @@ class ServiceWorker extends Gatherer {
    * @return {(!ServiceWorkerVersion|undefined)}
    */
   static getActivatedServiceWorker(versions, url) {
-    const origin = this.getOrigin(url);
-    return versions.find(v => v.status === 'activated' && this.getOrigin(v.scriptURL) === origin);
+    const origin = URL.getOrigin(url);
+    return versions.find(v => v.status === 'activated' && URL.getOrigin(v.scriptURL) === origin);
   }
 
   beforePass(options) {

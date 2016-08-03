@@ -19,6 +19,7 @@
 const NetworkRecorder = require('../../lib/network-recorder');
 const emulation = require('../../lib/emulation');
 const Element = require('../../lib/element');
+const URL = require('../../lib/url');
 
 const log = require('../../lib/log.js');
 
