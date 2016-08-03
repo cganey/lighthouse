@@ -106,6 +106,10 @@ class Driver {
     // log event listeners being bound
     this.formattedLog('listen for event =>', {method: eventName}, 'verbose');
     this._eventEmitter.on(eventName, cb);
+    this._eventEmitter.on(eventName, data => {
+      log.verbose('<=', eventName, data);
+      cb(data);
+    });
   }
 
   /**
