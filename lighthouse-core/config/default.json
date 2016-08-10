@@ -21,6 +21,7 @@
   },
   {
     "loadPage": true,
+    "network": true,
     "gatherers": [
       "service-worker",
       "offline"

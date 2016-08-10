@@ -82,8 +82,14 @@ class NetworkRecorder {
   }
 
   onResourceChangedPriority(data) {
-    this.networkManager._dispatcher.resourceChangedPriority(data.requestId,
-      data.newPriority, data.timestamp);
+    // TODO: this.networkManager._dispatcher.resourceChangedPriority is set to
+    // undefined when onResourceChangedPriority is triggered in
+    // gatherers/offline.js. The underlying cause may need to be investigated.
+    // In the meantime, explicitly check that it's a function.
+    if (typeof this.networkManager._dispatcher.resourceChangedPriority === 'function') {
+      this.networkManager._dispatcher.resourceChangedPriority(data.requestId,
+        data.newPriority, data.timestamp);
+    }
   }
 
   static recordsFromLogs(logs) {
