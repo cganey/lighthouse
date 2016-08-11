@@ -33,8 +33,8 @@ class Runner {
     const parsedURL = url.parse(opts.url);
     // canonicalize URL with any trailing slashes neccessary
     opts.url = url.format(parsedURL);
-    // If the URL isn't https or localhost complain to the user.
-    if (!parsedURL.protocol.includes('https') || parsedURL.hostname === 'http://localhost') {
+    // If the URL isn't https and is also not localhost complain to the user.
+    if (!parsedURL.protocol.includes('https') && parsedURL.hostname !== 'localhost') {
       log.warn('Lighthouse', 'The URL provided should be on HTTPS');
       log.warn('Lighthouse', 'Performance stats will be skewed redirecting from HTTP to HTTPS.');
     }
