@@ -25,19 +25,10 @@ const log = require('../../lib/log.js');
 class Driver {
 
   constructor() {
-    this._url = null;
     this.PAUSE_AFTER_LOAD = 500;
     this._traceEvents = [];
     this._traceCategories = Driver.traceCategories;
     this._eventEmitter = null;
-  }
-
-  get url() {
-    return this._url;
-  }
-
-  set url(_url) {
-    this._url = _url;
   }
 
   static get traceCategories() {

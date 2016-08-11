@@ -35,28 +35,4 @@ describe('URL gatherer', () => {
 
     return assert.equal(urlGather.artifact, url);
   });
-
-  it('returns the correct URL from options.driver', () => {
-    const url = 'https://example.com';
-    urlGather.beforePass({
-      driver: {
-        url
-      }
-    });
-
-    return assert.equal(urlGather.artifact, url);
-  });
-
-  it('chooses the URL from options over options.driver', () => {
-    const url = 'https://example.com';
-    const driverUrl = 'https://example2.com';
-    urlGather.beforePass({
-      url,
-      driver: {
-        url: driverUrl
-      }
-    });
-
-    return assert.equal(urlGather.artifact, url);
-  });
 });
