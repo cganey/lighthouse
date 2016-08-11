@@ -22,10 +22,22 @@ const assetSaver = require('./lib/asset-saver');
 const log = require('./lib/log');
 const fs = require('fs');
 const path = require('path');
+const url = require('url');
 
 class Runner {
   static run(driver, opts) {
     const config = opts.config;
+
+    // save the initialUrl provided by the user
+    opts.initialUrl = opts.url;
+    const parsedURL = url.parse(opts.url);
+    // canonicalize URL with any trailing slashes neccessary
+    opts.url = url.format(parsedURL);
+    // If the URL isn't https or localhost complain to the user.
+    if (!parsedURL.protocol.includes('https') || parsedURL.hostname === 'http://localhost') {
+      log.warn('Lighthouse', 'The URL provided should be on HTTPS');
+      log.warn('Lighthouse', 'Performance stats will be skewed redirecting from HTTP to HTTPS.');
+    }
 
     // Check that there are passes & audits...
     const validPassesAndAudits = config.passes && config.audits;
@@ -95,6 +107,7 @@ class Runner {
               return formatted;
             }, {});
             return {
+              initialUrl: opts.initialUrl,
               url: opts.url,
               audits: formattedAudits,
               aggregations

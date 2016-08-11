@@ -218,6 +218,28 @@ class Driver {
     });
   }
 
+  /**
+   * If our main document URL redirects, we will update options.url accordingly
+   * As such, options.url will always represent the post-redirected URL.
+   * options.initialUrl is the pre-redirect URL that things started with
+   *
+   * Caveat: only works when network recording enabled for a pass
+   */
+  updateUrlIfRedirected(opts) {
+    const networkManager = this._networkRecorder.networkManager;
+    networkManager.addEventListener(this._networkRecorder.EventTypes.RequestFinished, request => {
+      // Quit if this is not a redirected request
+      if (!request.data.redirectSource) {
+        return;
+      }
+      const earlierRequest = request.data.redirectSource;
+      const redirectRequest = request.data;
+      if (earlierRequest.url === opts.url) {
+        opts.url = redirectRequest.url;
+      }
+    });
+  }
+
   gotoURL(url, options) {
     const waitForLoad = (options && options.waitForLoad) || false;
     const disableJavaScript = (options && options.disableJavaScript) || false;
@@ -334,10 +356,11 @@ class Driver {
     });
   }
 
-  beginNetworkCollect() {
+  beginNetworkCollect(opts) {
     return new Promise((resolve, reject) => {
       this._networkRecords = [];
       this._networkRecorder = new NetworkRecorder(this._networkRecords);
+      this.updateUrlIfRedirected(opts, NetworkRecorder);
 
       this.on('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
       this.on('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);

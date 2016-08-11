@@ -62,7 +62,7 @@ class GatherRunner {
     }
 
     if (config.network) {
-      pass = pass.then(_ => driver.beginNetworkCollect());
+      pass = pass.then(_ => driver.beginNetworkCollect(options));
     }
 
     return gatherers.reduce((chain, gatherer) => {
