@@ -351,7 +351,7 @@ class Driver {
     return new Promise((resolve, reject) => {
       this._networkRecords = [];
       this._networkRecorder = new NetworkRecorder(this._networkRecords);
-      this.updateUrlIfRedirected(opts, NetworkRecorder);
+      this.updateUrlIfRedirected(opts);
 
       this.on('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
       this.on('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
