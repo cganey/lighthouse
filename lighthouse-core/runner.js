@@ -52,8 +52,9 @@ class Runner {
     // to check that there are artifacts specified in the config, and throw if not.
     if (validPassesAndAudits || validArtifactsAndAudits) {
       if (validPassesAndAudits) {
+        opts.driver = driver;
         // Finally set up the driver to gather.
-        run = run.then(_ => GatherRunner.run(config.passes, Object.assign({}, opts, {driver})));
+        run = run.then(_ => GatherRunner.run(config.passes, opts));
       } else if (validArtifactsAndAudits) {
         run = run.then(_ => config.artifacts);
       }
@@ -106,6 +107,7 @@ class Runner {
               formatted[audit.name] = audit;
               return formatted;
             }, {});
+
             return {
               initialUrl: opts.initialUrl,
               url: opts.url,

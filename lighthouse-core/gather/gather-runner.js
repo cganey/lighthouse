@@ -198,8 +198,11 @@ class GatherRunner {
       // Run each pass
       .then(_ => {
         return passes.reduce((chain, config) => {
-          const runOptions = Object.assign({}, options, {config});
+          let runOptions;
           return chain
+              .then(_ => {
+                runOptions = Object.assign({}, options, {config});
+              })
               .then(_ => this.setup(runOptions))
               .then(_ => this.beforePass(runOptions))
               .then(_ => this.pass(runOptions))
@@ -209,7 +212,12 @@ class GatherRunner {
                 config.trace && Object.assign(tracingData.traces, loadData.traces);
                 config.network && (tracingData.networkRecords = loadData.networkRecords);
               })
-              .then(_ => this.tearDown(runOptions));
+              .then(_ => this.tearDown(runOptions))
+              .then(_ => {
+                // Update the outer options object of any post-redirect url
+                // Subsequent passes will use the new URL, and it'll be reported outwards
+                options.url = runOptions.url;
+              });
         }, Promise.resolve());
       })
       .then(_ => {
