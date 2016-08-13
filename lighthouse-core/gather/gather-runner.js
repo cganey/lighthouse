@@ -159,9 +159,10 @@ class GatherRunner {
 
   static run(passes, options) {
     const driver = options.driver;
+    const startingUrl = options.url;
     const tracingData = {traces: {}};
 
-    if (typeof options.url !== 'string' || options.url.length === 0) {
+    if (typeof startingUrl !== 'string' || startingUrl.length === 0) {
       return Promise.reject(new Error('You must provide a url to the driver'));
     }
 
@@ -186,7 +187,9 @@ class GatherRunner {
 
       // Run each pass
       .then(_ => {
-        return passes.reduce((chain, config) => {
+        // If the main document redirects, we'll update this to keep track
+        let urlAfterRedirects;
+        return passes.reduce((chain, config, passIndex) => {
           let runOptions;
           return chain
               .then(_ => {
@@ -202,11 +205,13 @@ class GatherRunner {
                 config.network && (tracingData.networkRecords = loadData.networkRecords);
               })
               .then(_ => {
-                // Update the outer options object of any post-redirect url
-                // Subsequent passes will use the new URL, and it'll be reported outwards
-                options.url = runOptions.url;
+                if (passIndex === 0) {
+                  urlAfterRedirects = runOptions.url;
+                }
               });
-        }, Promise.resolve());
+        }, Promise.resolve()).then(_ => {
+          options.url = urlAfterRedirects;
+        });
       })
       .then(_ => {
         // We dont need to hold up the reporting for the reload/disconnect,
